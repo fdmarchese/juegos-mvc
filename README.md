@@ -11,7 +11,7 @@ La aplicación se trata de un sistema de compra de Juegos con dos roles (Cliente
  - Adicionar todos los modelos dentro de la carpeta Models cada uno en un archivo separado.
  - Especificar todas las restricciones y validaciones solicitadas a cada una de las entidades.
  - Crear una carpeta Database que dentro tendrá el dbContext que será utilizado.
- - Especificar cada una de las validaciones para cada una de las propiedades de cada uno de los modelos
+ - Aplicar las validaciones necesarias en los controladores
  - Crear el dbContext utilizando base de datos en memoria. Como referencia ver [este dbContext](https://github.com/fdmarchese/mvc-intro/blob/e07249bc8f092124fadd318b7b9a0c40122af446/UsandoEntityFramework/Database/UsandoEFDbContext.cs). Recordar adicionalmente que debemos configurar la base de datos a utilizar en el archivo [Startup](https://github.com/fdmarchese/mvc-intro/blob/e07249bc8f092124fadd318b7b9a0c40122af446/UsandoEntityFramework/Startup.cs#L39).
  - Crear el Scaffolding para permitir los CRUD de las entidades: Géneros, Juegos, Categorías de juego y Clientes.
  - Permitir en la creación y edición de juegos asignarle el género en lugar de tener que hacerlo en un paso separado.
@@ -21,6 +21,7 @@ La aplicación se trata de un sistema de compra de Juegos con dos roles (Cliente
  - La búsqueda de juegos debe ser una experiencia de usuario enriquecida permitiendo realizar múltiples filtros por criterios tales como Genero, rango de precio, consola, etc.
  - Al mostrar la lista de Juegos mostrar algún distintivo de css indicado en la categoria del juego utilizando la propiedad Css de "Categoria".
  - Al mostrar la lista de Juegos mostrar el ícono asociado a la consola del juego (utilizar una clase de css obtenida de [fontawesome](https://fontawesome.com/icons?d=gallery&m=free)).
+ - Al ingresar al sistema hacer que se muestre un cartel de bienvenida al usuario (sólo se mostrará al loguearse).
 <hr />
 
 ## Entidades 📄
@@ -48,7 +49,7 @@ La aplicación se trata de un sistema de compra de Juegos con dos roles (Cliente
 **Administrador : Usuario**
 ```
 - Id : int
-- Legajo : string
+- Legajo : Guid
 ```
 
 **Genero**
@@ -162,8 +163,7 @@ NOTA: aquí un link para refrescar el uso de los [Data annotations](https://www.
 - Id
 	- Primary Key.
 - Legajo
-	- Será autogenerado mediante la función Guid.NewGuid().ToString("N"). Esto nos asegura un número hexadecimal de 32 dígitos único.
-	- Para evitar que se muestre en el scaffolding generado utilizar el data annotation [ScaffoldColumn(false)]
+	- Será autogenerado mediante la función Guid.NewGuid(). Esto nos asegura una combinación de 32 dígitos hexadecimales y 4 guiones que serán únicos.
 
 **Genero**
 - Id
