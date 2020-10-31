@@ -1,4 +1,5 @@
-﻿using System;
+﻿using juegos_mvc.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -25,6 +26,7 @@ namespace juegos_mvc.Models
 
         [Required(ErrorMessage = "Este campo es requerido")]
         [Display(Name = "Año de lanzamiento")]
+        [AnioDesdeHastaHoy(1900)]
         public int AnioLanzamiento { get; set; }
 
         [ForeignKey(nameof(Categoria))]

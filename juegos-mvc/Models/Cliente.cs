@@ -1,4 +1,5 @@
-﻿using System;
+﻿using juegos_mvc.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -15,6 +16,7 @@ namespace juegos_mvc.Models
         [Required(ErrorMessage = "Este campo es requerido")]
         [Display(Name = "Fecha de nacimiento")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+        [MayorDeEdad(12)]
         public DateTime FechaDeNacimiento { get; set; }
 
         public List<Compra> Compras { get; set; }
