@@ -1,7 +1,7 @@
 # Portal de compra de juegos en ASP.NET MVC Core 📖
 
 ## Objetivos del ejercicio 📋
-Utilizar Visual Studio y crear una aplicación utilizando ASP.NET MVC Core.
+Utilizar Visual Studio y crear una aplicación utilizando ASP.NET MVC Core 3.1.
 La aplicación se trata de un sistema de compra de Juegos con dos roles (Cliente y Administrador).
 
 <hr />
@@ -12,7 +12,7 @@ La aplicación se trata de un sistema de compra de Juegos con dos roles (Cliente
  - Especificar todas las restricciones y validaciones solicitadas a cada una de las entidades.
  - Crear una carpeta Database que dentro tendrá el dbContext que será utilizado.
  - Aplicar las validaciones necesarias en los controladores
- - Crear el dbContext utilizando base de datos en memoria. Como referencia ver [este dbContext](https://github.com/fdmarchese/mvc-intro/blob/e07249bc8f092124fadd318b7b9a0c40122af446/UsandoEntityFramework/Database/UsandoEFDbContext.cs). Recordar adicionalmente que debemos configurar la base de datos a utilizar en el archivo [Startup](https://github.com/fdmarchese/mvc-intro/blob/e07249bc8f092124fadd318b7b9a0c40122af446/UsandoEntityFramework/Startup.cs#L39).
+ - Crear el dbContext utilizando base de datos en memoria. Como referencia ver [este dbContext](https://github.com/fdmarchese/asp-net-mvc-intro/blob/master/usando-seguridad/Database/SeguridadDbContext.cs). Recordar adicionalmente que debemos configurar la base de datos a utilizar en el archivo [Startup](https://github.com/fdmarchese/asp-net-mvc-intro/blob/4ee8ec2f13d0a0b765f834c66fbb362537b20f2e/usando-seguridad/Startup.cs#L47).
  - Crear el Scaffolding para permitir los CRUD de las entidades: Géneros, Juegos, Categorías de juego y Clientes.
  - Permitir en la creación y edición de juegos asignarle el género en lugar de tener que hacerlo en un paso separado.
  - Realizar un sistema de login con roles de usuario y Admin.
@@ -155,7 +155,7 @@ NOTA: aquí un link para refrescar el uso de los [Data annotations](https://www.
 	- Sólo admite el formato NN.NNN.NNN (utilizar regular expression).
 - FechaDeNacimiento
 	- Requerido.
-	- Debe ser mayor de 12 años (esta validación la realizamos en el controller).
+	- Debe ser mayor de 12 años (esta validación la realizamos con un custom validation attribute).
 - Compras
 	- Lista de compras realizadas por el cliente.
  
@@ -198,7 +198,7 @@ NOTA: aquí un link para refrescar el uso de los [Data annotations](https://www.
 - PrecioOriginal
 	- Precio en dólares original del juego.
 - AnioLanzamiento
-	- año de lanzamiento. Debe igual o menor al año actual y mayor a 1900. Al ser dinámica la validación del año actual debe hacerse en el controlador.
+	- año de lanzamiento. Debe ser igual o menor al año actual y mayor a 1900. Crear y utilizar un custom validation attribute.
 - CategoriaId
 	- Foreign Key con Categoria.
 - Categoria
