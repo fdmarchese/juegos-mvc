@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="text-center">
+    <h1>Bienvenido al portal de Juegos</h1>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-lg-offset-4 col-md-4">
+        <form method="post" asp-action="Login">
+            <div class="text-danger">
+                @ViewBag.Error
+            </div>
+            <div class="form-group">
+                <label laber-for="username" class="control-label">Nombre de usuario:</label>
+                <input name="username" class="form-control" type="text" value="@ViewBag.Username" />
+            </div>
+            <div class="form-group">
+                <label label-for="password" class="control-label">Contraseña:</label>
+                <input name="password" class="form-control" type="password" />
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="rol" id="rolCliente" value="@Rol.Cliente" checked>
+                <label class="form-check-label" for="rolCliente">
+                    @Rol.Cliente.ToString()
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="rol" id="rolAdministrador" value="@Rol.Administrador">
+                <label class="form-check-label" for="rolAdministrador">
+                    @Rol.Administrador.ToString()
+                </label>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    Login
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

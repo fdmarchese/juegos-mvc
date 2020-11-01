@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using juegos_mvc.Database;
 using juegos_mvc.Models;
+using usando_seguridad.Extensions;
 
 namespace juegos_mvc.Controllers
 {
@@ -19,13 +20,11 @@ namespace juegos_mvc.Controllers
             _context = context;
         }
 
-        // GET: Clientes
         public async Task<IActionResult> Index()
         {
             return View(await _context.Clientes.ToListAsync());
         }
 
-        // GET: Clientes/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -43,30 +42,38 @@ namespace juegos_mvc.Controllers
             return View(cliente);
         }
 
-        // GET: Clientes/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Clientes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Dni,FechaDeNacimiento,Id,Nombre,Apellido,Username")] Cliente cliente)
+        public IActionResult Create(Cliente cliente, string pass)
         {
+            try
+            {
+                pass.ValidarPassword();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(nameof(Cliente.Password), ex.Message);
+            }
+
+
             if (ModelState.IsValid)
             {
                 cliente.Id = Guid.NewGuid();
+                cliente.FechaAlta = DateTime.Now;
+                cliente.FechaUltimaModificacion = DateTime.Now;
+                cliente.Password = pass.Encriptar();
                 _context.Add(cliente);
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             return View(cliente);
         }
 
-        // GET: Clientes/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -82,13 +89,22 @@ namespace juegos_mvc.Controllers
             return View(cliente);
         }
 
-        // POST: Clientes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Dni,FechaDeNacimiento,Id,Nombre,Apellido,Username")] Cliente cliente)
+        public IActionResult Edit(Guid id, Cliente cliente, string pass)
         {
+            if (!string.IsNullOrWhiteSpace(pass))
+            {
+                try
+                {
+                    pass.ValidarPassword();
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(nameof(Cliente.Password), ex.Message);
+                }
+            }
+
             if (id != cliente.Id)
             {
                 return NotFound();
@@ -98,8 +114,20 @@ namespace juegos_mvc.Controllers
             {
                 try
                 {
-                    _context.Update(cliente);
-                    await _context.SaveChangesAsync();
+                    var clienteDb = _context.Clientes.FirstOrDefault(cliente => cliente.Id == id);
+
+                    clienteDb.Nombre = cliente.Nombre;
+                    clienteDb.Apellido = cliente.Apellido;
+                    clienteDb.FechaDeNacimiento = cliente.FechaDeNacimiento;
+                    clienteDb.Username = cliente.Username;
+                    clienteDb.Dni = cliente.Dni;
+
+                    if (!string.IsNullOrWhiteSpace(pass))
+                    {
+                        clienteDb.Password = pass.Encriptar();
+                    }
+
+                    _context.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -117,7 +145,6 @@ namespace juegos_mvc.Controllers
             return View(cliente);
         }
 
-        // GET: Clientes/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -135,7 +162,6 @@ namespace juegos_mvc.Controllers
             return View(cliente);
         }
 
-        // POST: Clientes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

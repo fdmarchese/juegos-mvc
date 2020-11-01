@@ -1,4 +1,5 @@
 using juegos_mvc.Database;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,15 @@ namespace juegos_mvc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            {
+                options.LoginPath = "/Accesos/Login";
+                options.AccessDeniedPath = "/Accesos/NoAutorizado";
+                options.LogoutPath = "/Accesos/Logout";
+                options.ExpireTimeSpan = new System.TimeSpan(2, 0, 0);
+                options.SlidingExpiration = true;
+            });
+
             services.AddControllersWithViews();
 
             services.AddDbContext<PortalJuegosDbContext>(options => options.UseSqlite("filename=portaljuegos.db"));
@@ -40,6 +50,8 @@ namespace juegos_mvc
 
             app.UseRouting();
 
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -48,6 +60,8 @@ namespace juegos_mvc
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            app.UseCookiePolicy();
         }
     }
 }

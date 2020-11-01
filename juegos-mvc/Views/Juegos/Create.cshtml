@@ -6,50 +6,50 @@
 
 <div class="row">
     <div class="col-md-6 offset-md-3">
-        <form asp-action="Create">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Alta de Juego</h5>
-                </div>
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="Titulo" class="control-label"></label>
-                    <input asp-for="Titulo" class="form-control" />
-                    <span asp-validation-for="Titulo" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Stock" class="control-label"></label>
-                    <input asp-for="Stock" class="form-control" />
-                    <span asp-validation-for="Stock" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="PrecioOriginal" class="control-label"></label>
-                    <input asp-for="PrecioOriginal" class="form-control" />
-                    <span asp-validation-for="PrecioOriginal" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="AnioLanzamiento" class="control-label"></label>
-                    <input asp-for="AnioLanzamiento" class="form-control" />
-                    <span asp-validation-for="AnioLanzamiento" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="CategoriaId" class="control-label"></label>
-                    <select asp-for="CategoriaId" class="form-control" asp-items="ViewBag.CategoriaId"></select>
-                </div>
-                <div class="form-group">
-                    <label asp-for="ConsolaId" class="control-label"></label>
-                    <select asp-for="ConsolaId" class="form-control" asp-items="ViewBag.ConsolaId"></select>
-                </div>
-                <div class="form-group">
-                    <label for="generoIds" class="control-label"></label>
-                    <select name="generoIds" class="form-control" asp-items="ViewBag.Genero" multiple></select>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Confirmar" class="btn btn-success" />
-                    <a asp-action="Index" class="btn btn-danger">Cancelar</a>
-                </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Alta de Juego</h5>
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Titulo" class="control-label"></label>
+                        <input asp-for="Titulo" class="form-control" />
+                        <span asp-validation-for="Titulo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Stock" class="control-label"></label>
+                        <input asp-for="Stock" class="form-control" />
+                        <span asp-validation-for="Stock" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PrecioOriginal" class="control-label"></label>
+                        <input asp-for="PrecioOriginal" class="form-control" />
+                        <span asp-validation-for="PrecioOriginal" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="AnioLanzamiento" class="control-label"></label>
+                        <input asp-for="AnioLanzamiento" class="form-control" />
+                        <span asp-validation-for="AnioLanzamiento" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="CategoriaId" class="control-label"></label>
+                        <select asp-for="CategoriaId" class="form-control" asp-items="ViewBag.CategoriaId"></select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ConsolaId" class="control-label"></label>
+                        <select asp-for="ConsolaId" class="form-control" asp-items="ViewBag.ConsolaId"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="generoIds" class="control-label"></label>
+                        <select name="generoIds" class="form-control" asp-items="ViewBag.Genero" multiple></select>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Confirmar" class="btn btn-success" />
+                        <a asp-action="Index" class="btn btn-danger">Cancelar</a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 

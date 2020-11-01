@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using juegos_mvc.Database;
 using juegos_mvc.Models;
+using usando_seguridad.Extensions;
 
 namespace juegos_mvc.Controllers
 {
@@ -19,13 +20,11 @@ namespace juegos_mvc.Controllers
             _context = context;
         }
 
-        // GET: Administradores
         public async Task<IActionResult> Index()
         {
             return View(await _context.Administradores.ToListAsync());
         }
 
-        // GET: Administradores/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -43,22 +42,31 @@ namespace juegos_mvc.Controllers
             return View(administrador);
         }
 
-        // GET: Administradores/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Administradores/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Username")] Administrador administrador)
+        public async Task<IActionResult> Create(Administrador administrador, string pass)
         {
+            try
+            {
+                pass.ValidarPassword();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(nameof(Administrador.Password), ex.Message);
+            }
+
             if (ModelState.IsValid)
             {
                 administrador.Id = Guid.NewGuid();
+                administrador.FechaAlta = DateTime.Now;
+                administrador.FechaUltimaModificacion = DateTime.Now;
+                administrador.Legajo = Guid.NewGuid();
+                administrador.Password = pass.Encriptar();
                 _context.Add(administrador);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -66,7 +74,6 @@ namespace juegos_mvc.Controllers
             return View(administrador);
         }
 
-        // GET: Administradores/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -82,13 +89,22 @@ namespace juegos_mvc.Controllers
             return View(administrador);
         }
 
-        // POST: Administradores/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Nombre,Apellido,Username")] Administrador administrador)
+        public IActionResult Edit(Guid id, Administrador administrador, string pass)
         {
+            if (!string.IsNullOrWhiteSpace(pass))
+            {
+                try
+                {
+                    pass.ValidarPassword();
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(nameof(Cliente.Password), ex.Message);
+                }
+            }
+
             if (id != administrador.Id)
             {
                 return NotFound();
@@ -98,8 +114,18 @@ namespace juegos_mvc.Controllers
             {
                 try
                 {
-                    _context.Update(administrador);
-                    await _context.SaveChangesAsync();
+                    var adminDb = _context.Administradores.First(admin => admin.Id == id);
+
+                    adminDb.Nombre = administrador.Nombre;
+                    adminDb.Apellido = administrador.Apellido;
+                    adminDb.Username = administrador.Username;
+
+                    if (!string.IsNullOrWhiteSpace(pass))
+                    {
+                        adminDb.Password = pass.Encriptar();
+                    }
+
+                    _context.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -115,35 +141,6 @@ namespace juegos_mvc.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(administrador);
-        }
-
-        // GET: Administradores/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var administrador = await _context.Administradores
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (administrador == null)
-            {
-                return NotFound();
-            }
-
-            return View(administrador);
-        }
-
-        // POST: Administradores/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
-        {
-            var administrador = await _context.Administradores.FindAsync(id);
-            _context.Administradores.Remove(administrador);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool AdministradorExists(Guid id)
