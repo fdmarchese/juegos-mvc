@@ -6,9 +6,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using juegos_mvc.Database;
 using juegos_mvc.Models;
+using Microsoft.AspNetCore.Authorization;
+using juegos_mvc.Models.Enums;
 
 namespace juegos_mvc.Controllers
 {
+    [Authorize(Roles = nameof(Rol.Administrador))]
     public class JuegosController : Controller
     {
         private readonly PortalJuegosDbContext _context;
@@ -195,6 +198,30 @@ namespace juegos_mvc.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public IActionResult Buscar(string titulo, Guid? consolaId, Guid? categoriaId, Guid? generoId)
+        {
+            var juegos = _context
+                .Juegos
+                .Include(x => x.Generos).ThenInclude(x => x.Genero)
+                .Include(x => x.Consola)
+                .Include(x => x.Categoria)
+                .Where(x => (string.IsNullOrWhiteSpace(titulo) || EF.Functions.Like(x.Titulo, $"%{titulo}%"))
+                            && (!consolaId.HasValue || x.ConsolaId == consolaId.Value)
+                            && (!categoriaId.HasValue || x.CategoriaId == categoriaId.Value)
+                            && (!generoId.HasValue || x.Generos.Any(genero => genero.GeneroId == generoId.Value)))
+                .ToList();
+
+            ViewBag.Consolas = new SelectList(_context.Consolas, nameof(Consola.Id), nameof(Consola.Descripcion), consolaId);
+            ViewBag.Categorias = new SelectList(_context.Categorias, nameof(Categoria.Id), nameof(Categoria.Descripcion), categoriaId);
+            ViewBag.Generos = new SelectList(_context.Generos, nameof(Genero.Id), nameof(Genero.Descripcion), generoId);
+            ViewBag.Titulo = titulo;
+
+            return View(juegos);
+        }
+
 
         private bool JuegoExists(Guid id)
         {

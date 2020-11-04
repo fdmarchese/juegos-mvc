@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using juegos_mvc.Database;
 using juegos_mvc.Models;
 using usando_seguridad.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using juegos_mvc.Models.Enums;
 
 namespace juegos_mvc.Controllers
 {
+    [Authorize]
     public class ClientesController : Controller
     {
         private readonly PortalJuegosDbContext _context;
@@ -20,11 +21,13 @@ namespace juegos_mvc.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = nameof(Rol.Administrador))]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Clientes.ToListAsync());
         }
 
+        [Authorize(Roles = nameof(Rol.Administrador))]
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -74,6 +77,7 @@ namespace juegos_mvc.Controllers
             return View(cliente);
         }
 
+        [Authorize(Roles = nameof(Rol.Administrador))]
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -89,6 +93,7 @@ namespace juegos_mvc.Controllers
             return View(cliente);
         }
 
+        [Authorize(Roles = nameof(Rol.Administrador))]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Guid id, Cliente cliente, string pass)
@@ -145,6 +150,7 @@ namespace juegos_mvc.Controllers
             return View(cliente);
         }
 
+        [Authorize(Roles = nameof(Rol.Administrador))]
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -162,6 +168,7 @@ namespace juegos_mvc.Controllers
             return View(cliente);
         }
 
+        [Authorize(Roles = nameof(Rol.Administrador))]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

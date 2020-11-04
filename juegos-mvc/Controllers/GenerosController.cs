@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using juegos_mvc.Database;
 using juegos_mvc.Models;
+using Microsoft.AspNetCore.Authorization;
+using juegos_mvc.Models.Enums;
 
 namespace juegos_mvc.Controllers
 {
+    [Authorize(Roles = nameof(Rol.Administrador))]
     public class GenerosController : Controller
     {
         private readonly PortalJuegosDbContext _context;

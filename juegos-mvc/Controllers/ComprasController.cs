@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using juegos_mvc.Database;
 using juegos_mvc.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace juegos_mvc.Controllers
 {
+    [Authorize]
     public class ComprasController : Controller
     {
         private readonly PortalJuegosDbContext _context;
