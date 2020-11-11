@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using juegos_mvc.Database;
 using juegos_mvc.Models;
 using Microsoft.AspNetCore.Authorization;
+using juegos_mvc.Models.Enums;
+using System.Linq;
+using System.Security.Claims;
 
 namespace juegos_mvc.Controllers
 {
@@ -19,23 +21,32 @@ namespace juegos_mvc.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        [Authorize(Roles = nameof(Rol.Administrador))]
+        [HttpGet]
+        public IActionResult Index()
         {
-            var portalJuegosDbContext = _context.Compras.Include(c => c.Cliente).Include(c => c.Juego);
-            return View(await portalJuegosDbContext.ToListAsync());
+            var compras = _context.Compras
+                .Include(compra => compra.Juego).ThenInclude(juego => juego.Categoria)
+                .Include(compra => compra.Juego).ThenInclude(juego => juego.Consola)
+                .Include(compra => compra.Juego).ThenInclude(juego => juego.Generos).ThenInclude(juegoGenero => juegoGenero.Genero)
+                .Include(compra => compra.Cliente)
+                .ToList();
+
+            return View(compras);
         }
 
-        public async Task<IActionResult> Details(Guid? id)
+        [Authorize(Roles = nameof(Rol.Administrador))]
+        public IActionResult Details(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var compra = await _context.Compras
+            var compra = _context.Compras
                 .Include(c => c.Cliente)
                 .Include(c => c.Juego)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefault(m => m.Id == id);
             if (compra == null)
             {
                 return NotFound();
@@ -44,27 +55,77 @@ namespace juegos_mvc.Controllers
             return View(compra);
         }
 
-        public IActionResult Create()
+        [HttpGet("Compras/Juego/{juegoId}")]
+        [Authorize(Roles = nameof(Rol.Cliente))]
+        public IActionResult Comprar(Guid juegoId)
         {
-            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Apellido");
-            ViewData["JuegoId"] = new SelectList(_context.Juegos, "Id", "Titulo");
-            return View();
-        }
+            var juego = _context.Juegos
+                .Include(juego => juego.Categoria)
+                .Include(juego => juego.Consola)
+                .Include(juego => juego.Generos).ThenInclude(juegoGenero => juegoGenero.Genero)
+                .FirstOrDefault(juego => juego.Id == juegoId);
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,JuegoId,ClienteId,FechaCompra,PrecioOriginal,PrecioFinal")] Compra compra)
-        {
-            if (ModelState.IsValid)
+            var compra = new Compra
             {
-                compra.Id = Guid.NewGuid();
-                _context.Add(compra);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Apellido", compra.ClienteId);
-            ViewData["JuegoId"] = new SelectList(_context.Juegos, "Id", "Titulo", compra.JuegoId);
+                Juego = juego,
+                JuegoId = juego.Id,
+                PrecioOriginal = juego.PrecioOriginal,
+                PrecioFinal = juego.PrecioOriginal - (juego.PrecioOriginal * juego.Categoria.PorcentajeDescuento / 100)
+            };
+
             return View(compra);
         }
+
+        [HttpPost("Compras/Juego/{juegoId}")]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = nameof(Rol.Cliente))]
+        public IActionResult ComprarPost(Guid juegoId)
+        {
+            var clienteId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var juego = _context.Juegos
+                .Include(juego => juego.Categoria)
+                .FirstOrDefault(juego => juego.Id == juegoId);
+
+            if (juego.Stock > 0)
+            {
+                juego.Stock -= 1;
+
+                var compra = new Compra()
+                {
+                    Id = Guid.NewGuid(),
+                    ClienteId = clienteId,
+                    JuegoId = juegoId,
+                    FechaCompra = DateTime.Now,
+                    PrecioOriginal = juego.PrecioOriginal,
+                    PrecioFinal = juego.PrecioOriginal - (juego.PrecioOriginal * juego.Categoria.PorcentajeDescuento / 100)
+                };
+
+                _context.Add(compra);
+                _context.SaveChanges();
+            }
+            else
+            {
+                TempData["Error"] = $"No se dispone de stock para el juego {juego.Titulo}";
+            }
+
+            return RedirectToAction(nameof(MisCompras));
+        }
+
+        [HttpGet]
+        [Authorize(Roles = nameof(Rol.Cliente))]
+        public IActionResult MisCompras()
+        {
+            var clienteId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var compras = _context.Compras
+                .Include(compra => compra.Juego).ThenInclude(juego => juego.Categoria)
+                .Include(compra => compra.Juego).ThenInclude(juego => juego.Consola)
+                .Include(compra => compra.Juego).ThenInclude(juego => juego.Generos).ThenInclude(juegoGenero => juegoGenero.Genero)
+                .Where(compra => compra.ClienteId == clienteId)
+                .ToList();
+
+            return View(compras);
+        }
+
     }
 }

@@ -39,7 +39,7 @@
                         $ @juego.PrecioOriginal.ToString("N2")
                     </td>
                     <td>
-                        <a class="btn btn-outline-success btn-sm" href="#">
+                        <a class="btn btn-outline-success btn-sm" asp-action="Comprar" asp-controller="Compras" asp-route-juegoId="@juego.Id">
                             Comprar <i class="fas fa-dollar-sign"></i>
                         </a>
                     </td>

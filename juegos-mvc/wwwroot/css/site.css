@@ -115,3 +115,8 @@ body {
     outline-color: #808080;
     outline-width: 1px;
 }
+
+.original-price {
+    color: #55595c;
+    text-decoration: line-through;
+}

@@ -4,3 +4,5 @@
 // Write your JavaScript code.
 
 document.querySelectorAll('[data-toggle="tooltip"]').forEach(m => $(m).tooltip());
+
+alertify.set('notifier', 'position', 'top-center');

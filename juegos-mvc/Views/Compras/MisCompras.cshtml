@@ -1,6 +1,11 @@
 ﻿@model List<Compra>
 
-<h4>compras realizadas</h4>
+@{
+    string errorMessage = TempData["Error"] as string;
+    var hayError = !string.IsNullOrWhiteSpace(errorMessage);
+}
+
+<h4>Mis compras realizadas</h4>
 
 <div class="table-responsive">
     <table class="table table-hover table-striped table-sm">
@@ -13,7 +18,6 @@
                 <th>Año lanzamiento</th>
                 <th>Fecha</th>
                 <th>Precio</th>
-                <th>Cliente</th>
             </tr>
         </thead>
         <tbody>
@@ -44,11 +48,17 @@
                         <br />
                         <span class="text-success">$ @compra.PrecioFinal.ToString("N2")</span>
                     </td>
-                    <td>
-                        @compra.Cliente.NombreYApellido
-                    </td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+
+@if (hayError)
+{
+    @section Scripts {
+        <script>
+            alertify.error('@errorMessage');
+        </script>
+    }
+}
